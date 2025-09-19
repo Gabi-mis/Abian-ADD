@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Pedir los parámetros al usuario
+echo "Introduce los datos de configuración de red:"
+read -p "IP (ej. 192.168.1.50): " IP
+read -p "Máscara (ej. 24): " MASK
+read -p "Puerta de enlace (Gateway, ej. 192.168.1.1): " GW
+read -p "DNS (ej. 8.8.8.8): " DNS
+
+# Interfaz (cámbiala si sabes el nombre exacto)
+IFACE="enp0s3"
+
+# Configuración de red
+sudo ip addr flush dev $IFACE
+sudo ip addr add $IP/$MASK dev $IFACE
+sudo ip link set $IFACE up
+sudo ip route add default via $GW
+echo "nameserver $DNS" | sudo tee /etc/resolv.conf > /dev/null
+
+# Mostrar configuración
+ip addr show dev $IFACE
+ip route | grep default
+cat /etc/resolv.conf
