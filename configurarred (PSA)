@@ -10,18 +10,21 @@ read -p "Introduce el DNS (ej. 8.8.8.8): " DNS
 IFACE="enp0s3"
 
 # Reescribir el archivo YAML de Netplan desde cero
-sudo tee /etc/netplan/01-config.yaml > /dev/null <<EOF
+sudo tee /etc/netplan/50-cloud-init.yaml  > /dev/null <<EOF
 network:
-  version: 2
   ethernets:
     $IFACE:
       dhcp4: no
       addresses:
         - $IP/$MASK
-      gateway4: $GW
+      routes:
+      - to: default
+        via: $GW
       nameservers:
         addresses: [$DNS]
+  version: 2
 EOF
+
 
 # Aplicar la configuración
 sudo netplan apply
@@ -30,4 +33,4 @@ sudo netplan apply
 echo -e "\n=== Configuración aplicada ==="
 ip addr show dev $IFACE
 ip route | grep default
-cat /etc/resolv.conf
+cat /etc/netplan/50-cloud-init.yaml
