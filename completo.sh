@@ -22,7 +22,7 @@ scriptadd(){
                 ;;
             1)
                 # --- Bisiesto ---
-                read -p "¿dime un año? " year
+                read -p "dime un año " year
                 if (( (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0) )); then
                     echo "El año $year es bisiesto ✅"
                 else
