@@ -107,15 +107,27 @@ EOF
                 fi                                                 
                 ;;
             5)
-                # --- Contar ficheros en un directorio ---
-                read -p "📂 Ingresa la ruta del directorio (ej. /c/Users/abian/Documents o C:\\Users\\abian\\Documents): " dir
-                winpath=$(cygpath -u "$dir")
-                if [ -d "$winpath" ]; then
-                    total=$(find "$winpath" -type f | wc -l)
-                    echo "📊 En el directorio '$winpath' hay $total ficheros."
-                else
-                    echo "❌ El directorio '$winpath' no existe."
-                fi
+                # --- Contar ficheros en un directorio ---                                      
+                read -p "📂 Ingresa la ruta del directorio: " dir                               
+                                                                                
+                # Detectar sistema operativo y convertir ruta si es Windows                    
+                case "$(uname -s)" in                                                          
+                    Linux)                                                                      
+                        path="$dir" ;;                                                          
+                    MINGW*|MSYS*|CYGWIN*)                                                       
+                        path=$(cygpath -u "$dir") ;;                                            
+                    *)                                                                          
+                        echo "⚠️ Sistema operativo no compatible."                              
+                        exit 1 ;;                                                               
+                esac                                                                            
+                                                                                
+                # Verificar si el directorio existe y contar ficheros directos                
+                if [ -d "$path" ]; then                                                         
+                    total=$(find "$path" -maxdepth 1 -type f | wc -l)                           
+                    echo "📊 En el directorio '$path' hay $total ficheros directos."           
+                else                                                                            
+                    echo "❌ El directorio '$path' no existe."                                   
+                fi                                                                              
                 ;;
             6)
                 # --- Mostrar permisos en octal ---
