@@ -130,15 +130,21 @@ EOF
                 fi                                                                              
                 ;;
             6)
-                # --- Mostrar permisos en octal ---
+               #!/bin/bash
+
                 read -p "🔐 Ingresa la ruta absoluta del objeto: " objeto
+
+                # Detectar si es Windows (Git Bash o similar)
+                if uname | grep -qiE 'mingw|cygwin'; then
+                    objeto=$(echo "$objeto" | sed -E 's|^([A-Za-z]):\\|/\L\1/|; s|\\|/|g')
+                fi
+
+                # Mostrar permisos si el objeto existe
                 if [ -e "$objeto" ]; then
-                    permisos=$(stat -c "%a" "$objeto")
-                    especiales=$(stat -c "%A" "$objeto")
-                    echo "📁 Permisos octales: $permisos"
-                    echo "🔎 Permisos simbólicos: $especiales"
+                    echo "📁 Permisos octales: $(stat -c "%a" "$objeto")"
+                    echo "🔎 Permisos simbólicos: $(stat -c "%A" "$objeto")"
                 else
-                    echo "❌ El objeto '$objeto' no existe."
+                echo "❌ El objeto '$objeto' no existe."
                 fi
                 ;;
             7)
