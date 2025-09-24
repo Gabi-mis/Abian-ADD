@@ -184,7 +184,7 @@ EOF
                 nombre=${nombre:-fichero_vacio}
                 read -p "Ingrese el tamaño en KB (por defecto 1024): " tam
                 tam=${tam:-1024}
-                dd if=/dev/zero of="$nombre" bs=1024 count="$tam" status=none
+                truncate -s "${tam}K" $nombre
                 echo "✅ Fichero '$nombre' creado con tamaño $tam KB"
                 ;;
             *)
