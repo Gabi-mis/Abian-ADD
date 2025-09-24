@@ -78,16 +78,33 @@ EOF
                 fi
                 ;;
             4)
-                # --- Buscar un fichero y contar vocales ---
-                read -p "📂 Ingresa el nombre exacto del fichero: " fichero
-                ruta=$(find /c/Users -type f -name "$fichero" 2>/dev/null | head -n 1)
-                if [ -z "$ruta" ]; then
-                    echo "❌ No se encontró el fichero '$fichero' en C:/Users"
-                else
-                    echo "✅ Fichero encontrado en: $ruta"
-                    vocales=$(grep -o -i "[aeiou]" "$ruta" | wc -l)
-                    echo "🔡 El archivo contiene $vocales vocales."
-                fi
+                #!/bin/bash                                      
+                                                   
+                read -p "📂 Nombre exacto del fichero: " fichero    
+                                                   
+                # Detectar sistema operativo y ruta base           
+                case "$(uname -s)" in                              
+                    Linux)                                         
+                    base_dir="/" ;;                            
+                MINGW*|MSYS*|CYGWIN*)                          
+                    base_dir="/c" ;;                           
+                *)                                             
+                    echo "⚠️ Sistema operativo no compatible." 
+                    exit 1 ;;                                  
+                esac                                               
+                                                   
+                echo "🔍 Buscando '$fichero' en todo el sistema..." 
+                                                   
+                # Buscar el archivo y contar vocales              
+                ruta=$(find "$base_dir" -type f -iname "$fichero" 2>/dev/null | head -n 1) 
+                                                   
+                if [[ -n "$ruta" ]]; then                          
+                    echo "✅ Fichero encontrado en: $ruta"          
+                    vocales=$(grep -oi "[aeiou]" "$ruta" | wc -l)  
+                    echo "🔡 El archivo contiene $vocales vocales." 
+                else                                               
+                    echo "❌ No se encontró el fichero '$fichero'"  
+                fi                                                 
                 ;;
             5)
                 # --- Contar ficheros en un directorio ---
