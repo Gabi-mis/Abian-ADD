@@ -61,7 +61,7 @@ EOF
                 num=$((RANDOM % 100 + 1))
                 echo "Adivina en 5 intentos un número aleatorio del 1 al 100"
                 acierto=0
-                for i in {1..5}; do
+                for i in $(seq 1 5); do
                   read -p "Intento $i: " x
                   if [ "$x" -eq "$num" ]; then
                       echo "🎉 ¡Enhorabuena! Adivinaste en $i intentos!"
