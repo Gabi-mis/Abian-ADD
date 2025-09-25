@@ -217,7 +217,7 @@ EOF
 
                 truncate -s "${tam}K" "$nombre"
                 echo "Fichero '$nombre' creado con tamaño $tam KB"
-
+                ;;
             *)
                 echo "Opción incorrecta"
                 ;;
