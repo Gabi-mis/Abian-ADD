@@ -14,6 +14,7 @@ scriptadd(){
         echo "Opción 7: romano"
         echo "Opción 8: automatizar"
         echo "Opción 9: crear fichero"
+        echo "Opción 10: crear fichero 2"
         echo "Opción 0: Salir"
         read -p "Elegir la opción deseada: " op
         echo ""
@@ -193,6 +194,30 @@ EOF
                 truncate -s "${tam}K" $nombre
                 echo "✅ Fichero '$nombre' creado con tamaño $tam KB"
                 ;;
+            10)
+                #!/bin/bash
+
+                read -p "Nombre del fichero (defecto 'fichero_vacio'): " nombre
+                nombre=${nombre:-fichero_vacio}
+
+                read -p "Tamaño en KB (defecto 1024): " tam
+                tam=${tam:-1024}
+
+                base="${nombre%.*}"
+                ext="${nombre##*.}"
+                [ "$base" = "$ext" ] && ext=""
+
+                if [ -e "$nombre" ]; then
+                    for i in {1..9}; do
+                            candidato="$base$i${ext:+.$ext}"
+                            [ ! -e "$candidato" ] && nombre="$candidato" && break
+                    done
+                            [ -e "$nombre" ] && echo "Ya existen '$base' con versiones 1-9" && exit 1
+                fi
+
+                truncate -s "${tam}K" "$nombre"
+                echo "Fichero '$nombre' creado con tamaño $tam KB"
+
             *)
                 echo "Opción incorrecta"
                 ;;
