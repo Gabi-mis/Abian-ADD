@@ -17,6 +17,7 @@ scriptadd(){
         echo "Opción 12: contusu (copia seguridad usuario)"
         echo "Opción 13: quita_blancos (renombrar ficheros)"
         echo "Opción 14: lineas (dibujar líneas de caracteres)"
+        echo "Opción 15: analizar directorio"
         echo "Opción 0: Salir"
         read -p "Elegir la opción deseada: " op
         echo ""
@@ -209,6 +210,19 @@ EOF
                 [[ ! $l =~ ^[0-9]+$ || $l -lt 1 || $l -gt 10 ]] && { echo "❌ Número de líneas debe ser 1-10"; break; }
                 for ((i=0;i<l;i++)); do
                     printf "%${n}s\n" "" | tr ' ' "$c"
+                done
+                ;;
+             15)
+                read -p "Introduce el directorio a analizar: " DIR
+                [ ! -d "$DIR" ] && { echo "❌ Error: $DIR no es un directorio"; break; }
+
+                read -p "Introduce las extensiones a analizar (separadas por espacio): " EXT
+                echo "===================================="
+                echo " Informe del directorio: $DIR"
+                echo " Extensiones: $EXT"
+                echo "===================================="
+                for ext in $EXT; do
+                    echo ".$ext -> $(find "$DIR" -type f -iname "*.$ext" | wc -l) archivos"
                 done
                 ;;
             *)
