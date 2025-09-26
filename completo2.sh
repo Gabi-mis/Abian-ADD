@@ -23,8 +23,13 @@ scriptadd(){
         case $op in
             0) ;;
             1)
+               # --- Bisiesto ---
                 read -p "dime un año " year
-                (( (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0) )) && echo "El año $year es bisiesto ✅" || echo "El año $year NO es bisiesto ❌"
+                if (( (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0) )); then
+                    echo "El año $year es bisiesto ✅"
+                else
+                    echo "El año $year NO es bisiesto ❌"
+                fi
                 ;;
             2)
                 read -p "Introduce la IP (ej. 192.168.1.50): " IP
