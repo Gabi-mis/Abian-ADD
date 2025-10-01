@@ -38,7 +38,7 @@ EOF
 }
 
 adivina() {
-    local num=$((RANDOM % 100 + 1))
+    local num=$((RANDOM % 101))
     echo "Adivina en 5 intentos un número aleatorio del 1 al 100"
     local acierto=0
     for i in $(seq 1 5); do
