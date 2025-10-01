@@ -14,7 +14,6 @@ bisiesto() {
 }
 
 configurarred() {
-    local IP=$1 MASK=$2 GW=$3 DNS=$4
     IFACE="enp0s3"
     sudo tee /etc/netplan/50-cloud-init.yaml > /dev/null <<EOF
 network:
@@ -22,19 +21,15 @@ network:
     $IFACE:
       dhcp4: no
       addresses:
-        - $IP/$MASK
+        - $1/$2
       routes:
       - to: default
-        via: $GW
+        via: $3
       nameservers:
-        addresses: [$DNS]
+        addresses: [$4]
   version: 2
 EOF
     sudo netplan apply
-    echo -e "\n=== Configuración aplicada ==="
-    ip addr show dev $IFACE
-    ip route | grep default
-    cat /etc/netplan/50-cloud-init.yaml
 }
 
 adivina() {
