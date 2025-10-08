@@ -1,0 +1,11 @@
+# Obtener el nombre del usuario actual
+$user = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+
+# Obtener el directorio actual
+$dir = Get-Location
+
+# Mostrar en consola con colores personalizados
+Write-Host -NoNewline $user -ForegroundColor Green
+Write-Host -NoNewline " "  # Espacio entre usuario y directorio
+Write-Host -NoNewline $dir -ForegroundColor Cyan
+Write-Host " #" -ForegroundColor Yellow
