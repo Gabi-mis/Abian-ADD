@@ -1,11 +1,12 @@
-# Obtener el nombre del usuario actual
-$user = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+function prompt {
+    $user = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+    $dir = Get-Location
 
-# Obtener el directorio actual
-$dir = Get-Location
+    # Imprime todo el prompt con colores
+    Write-Host $user -ForegroundColor Green -NoNewline
+    Write-Host " " -NoNewline
+    Write-Host $dir -ForegroundColor Cyan -NoNewline
+    Write-Host " #" -ForegroundColor Yellow -NoNewline
 
-# Mostrar en consola con colores personalizados
-Write-Host -NoNewline $user -ForegroundColor Green
-Write-Host -NoNewline " "  # Espacio entre usuario y directorio
-Write-Host -NoNewline $dir -ForegroundColor Cyan
-Write-Host " #" -ForegroundColor Yellow
+    return " "  # Devuelve un espacio para que el cursor esté después del prompt
+}
