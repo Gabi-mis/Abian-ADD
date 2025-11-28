@@ -1,4 +1,4 @@
-﻿#introduccion de parametros 
+#introduccion de parametros 
 param (
     [Parameter(Mandatory = $true)]
     [string]$fichero,
@@ -7,8 +7,11 @@ param (
 )
 
 # Validar que el fichero existe y es un archivo
-if (!(Test-Path $fichero) -or (Get-Item $fichero).PSIsContainer) {
-    Write-Host "Error: Se debe pasar un único fichero válido como parámetro." -ForegroundColor Yellow
+$parametrosRecibidos = @($fichero).Count
+if ($parametrosRecibidos -gt 1 -or !(Test-Path $fichero -ErrorAction SilentlyContinue) -or (Get-Item $fichero -ErrorAction SilentlyContinue).PSIsContainer) {
+    $fecha = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    Add-Content $errorLog "$fecha - Error: Se debe pasar un único fichero válido como parámetro. Parámetros recibidos: $fichero"
+    Write-Host "$fecha - Error: Se debe pasar un único fichero válido como parámetro. Parámetros recibidos: $fichero" -ForegroundColor Yellow
     exit
 }
 
@@ -46,6 +49,7 @@ Get-Content $fichero | ForEach-Object {
         $fecha = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
         $motivo = "Usuario no existe"
         Write-Host "$fecha-$login-$nombre $apellido1 $apellido2-$motivo" -ForegroundColor Red
+        Add-Content $errorLog "$fecha - $login - $nombre $apellido1 $apellido2 - $motivo"
         return
     }
 
@@ -79,7 +83,9 @@ Get-Content $fichero | ForEach-Object {
         Set-Acl $destino $acl
         Write-Host "contenido de la carpeta $destino cambiado de dueño a administrador"
     } catch {
+        $motivo = "Advertencia: No se pudo cambiar el propietario de $destino"
         Write-Host "Advertencia: No se pudo cambiar el propietario de $destino"
+        Add-Content $errorLog "$fecha - $login - $nombre $apellido1 $apellido2 - $motivo"
     }
 
     # Eliminar usuario y perfil
@@ -88,6 +94,8 @@ Get-Content $fichero | ForEach-Object {
         Remove-Item "C:\Users\$login" -Recurse -Force -ErrorAction SilentlyContinue
         Write-Host "el usuario $login se ha eliminado correctamente" -ForegroundColor Green
     } catch {
+        $motivo = "Advertencia: No se pudo eliminar el usuario o su carpeta"
         Write-Host "Advertencia: No se pudo eliminar el usuario o su carpeta"
+        Add-Content $errorLog "$fecha - $login - $nombre $apellido1 $apellido2 - $motivo"
     }
 }
