@@ -18,6 +18,7 @@ Get-Content $fichero | ForEach-Object {
     $nombre,$apellido1,$apellido2,$login = $linea -split ":"
     $usuario = Get-LocalUser -Name $login -EA 0
     $fecha = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    Write-Host "fichero procesado"
     
     if($DryRun) {
         Write-Host "[DRY-RUN] $fecha - Usuario: $login ($nombre $apellido1 $apellido2)" -f Cyan
@@ -62,3 +63,4 @@ Get-Content $fichero | ForEach-Object {
         Add-Content $errorLog "$fecha - $login - $nombre $apellido1 $apellido2 - Error eliminación"
     }
 }
+
