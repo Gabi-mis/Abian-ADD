@@ -10,37 +10,37 @@ if(!$Accion) {
 function Crear-Grupo($n,$a,$t) {
     $amb = if($a -match "uni"){"Universal"}elseif($a -match "loc"){"DomainLocal"}else{"Global"}
     $tip = if($t -match "dist"){"Distribution"}else{"Security"}
-    if(Get-ADGroup -Filter "Name -eq '$n'" -EA 0) {Write-Host "Grupo existe" -f Yellow; return}
+    if(Get-ADGroup -Filter "Name -eq '$n'" -EA 0) {Write-Host "El grupo ya está creado" -f Yellow; return}
     New-ADGroup -Name $n -SamAccountName $n -GroupScope $amb -GroupCategory $tip -Path "CN=Users,$((Get-ADDomain).DistinguishedName)"
-    Write-Host "Grupo creado" -f Green
+    Write-Host "Grupo '$n' creado [$amb/$tip]" -f Green
 }
 
 function Crear-Usuario($nom,$u,$ou) {
     $path = (Get-ADOrganizationalUnit -Filter "Name -eq '$ou'" -EA 0).DistinguishedName
-    if(!$path) {Write-Host "UO no existe" -f Red; return}
-    if(Get-ADUser -Filter "SamAccountName -eq '$u'" -EA 0) {Write-Host "Usuario existe" -f Yellow; return}
+    if(!$path) {Write-Host "La UO '$ou' no existe" -f Red; return}
+    if(Get-ADUser -Filter "SamAccountName -eq '$u'" -EA 0) {Write-Host "El usuario ya existe" -f Yellow; return}
     $pw = -join((48..57+65..90+97..122+33,35,36,37,38,42,43,45,61,63,64)|Get-Random -C 12|%{[char]$_})
     New-ADUser -Name $nom -SamAccountName $u -Path $path -AccountPassword (ConvertTo-SecureString $pw -AsPlainText -Force) -Enabled $true
-    Write-Host "Usuario creado. Pass: $pw" -f Green
+    Write-Host "Usuario '$u' creado. Contraseña: $pass" -f Green
 }
 
 function Modificar-Usuario($u,$pw,$e) {
     if(!(Get-ADUser -Filter "SamAccountName -eq '$u'" -EA 0)) {Write-Host "Usuario no existe" -f Red; return}
-    $m = if($pw.Length -lt 8){"8+ caracteres"}elseif($pw -cnotmatch '[A-Z]'){"mayúscula"}
-    elseif($pw -cnotmatch '[a-z]'){"minúscula"}elseif($pw -notmatch '\d'){"número"}
-    elseif($pw -notmatch '[^a-zA-Z0-9]'){"especial"}
-    if($m) {Write-Host "Pass inválida: falta $m" -f Red; return}
+    $m = if($pw.Length -lt 8){"debe tener mínimo 8 caracteres"}elseif($pw -cnotmatch '[A-Z]'){"debe contener al menos una mayúscula"}
+    elseif($pw -cnotmatch '[a-z]'){"debe contener al menos una minúscula"}elseif($pw -notmatch '\d'){"debe contener al menos un número"}
+    elseif($pw -notmatch '[^a-zA-Z0-9]'){"debe contener al menos un carácter especial"}
+    if($m) {Write-Host "Error: La contraseña no es válida. Motivo: $m" -f Red; return}
     Set-ADAccountPassword -Identity $u -NewPassword (ConvertTo-SecureString $pw -AsPlainText -Force) -Reset
-    Write-Host "Pass modificada" -f Green
-    if($e -match "hab") {Enable-ADAccount $u; Write-Host "Habilitada" -f Green}
-    elseif($e -match "des") {Disable-ADAccount $u; Write-Host "Deshabilitada" -f Yellow}
+    Write-Host "Contraseña modificada correctamente" -f Green
+    if($e -match "hab") {Enable-ADAccount $u; Write-Host "Cuenta habilitada" -f Green}
+    elseif($e -match "des") {Disable-ADAccount $u; Write-Host "Cuenta Deshabilitada" -f Yellow}
 }
 
 function Agregar-Grupo($usr,$grp) {
-    if(!(Get-ADUser -Filter "SamAccountName -eq '$usr'" -EA 0)) {Write-Host "Usuario no existe" -f Red; return}
-    if(!(Get-ADGroup -Filter "Name -eq '$grp'" -EA 0)) {Write-Host "Grupo no existe" -f Red; return}
+    if(!(Get-ADUser -Filter "SamAccountName -eq '$usr'" -EA 0)) {Write-Host "Error: El usuario no existe" -f Red; return}
+    if(!(Get-ADGroup -Filter "Name -eq '$grp'" -EA 0)) {Write-Host "Error: El grupo no existe" -f Red; return}
     Add-ADGroupMember -Identity $grp -Members $usr -EA 0
-    Write-Host "Asignado correctamente" -f Green
+    Write-Host "Asignación realizada correctamente" -f Green
 }
 
 function Listar($tipo,$ou) {
