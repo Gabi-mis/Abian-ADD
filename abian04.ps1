@@ -1,20 +1,21 @@
-param([string]$ScriptPath)
+param([string]$ScriptPath,[switch]$DryRun)
 
 $ErrorActionPreference='Stop'
+if($DryRun){Write-Host "`n[DRY-RUN] Modo simulación activado - No se realizarán cambios reales`n" -F Cyan}
 $l="$env:SystemRoot\System32\LogFiles"
 $bl="$l\bajas.log";$el="$l\bajaserror.log";$pr="C:\Users\proyecto"
 $pwd=ConvertTo-SecureString "P@ssw0rd!" -AsPlainText -Force
 $n=0;$e=@()
-ri $bl,$el,$pr -EA 0
-mkdir $l,$pr -Force|Out-Null
+if(!$DryRun){ri $bl,$el,$pr -EA 0;mkdir $l,$pr -Force|Out-Null}
 
 function V($c,$nm,$es,$ob){
 if($c){$script:n++;Write-Host "✓ $nm" -F Green}
 else{$script:e+="$nm : Esperado '$es', obtenido '$ob'"
 Write-Host "✗ $nm" -F Red}}
 
-function P($lg,$nom,$a1,$a2){try{
-if(!(Get-LocalUser $lg -EA 0)){
+function P($lg,$nom,$a1,$a2){
+if($DryRun){Write-Host "[DRY-RUN] Preparando usuario: $lg" -F Cyan;return}
+try{if(!(Get-LocalUser $lg -EA 0)){
 New-LocalUser $lg -FullName "$nom $a1 $a2" -Password $pwd -PasswordNeverExpires|Out-Null}
 $t="C:\Users\$lg\trabajo";mkdir $t -Force|Out-Null
 sc "$t\archivo.txt" "x";sc "$t\documento.txt" "y"
